@@ -11,6 +11,7 @@
  */
 package assignment4;
 
+import java.util.Arrays;
 import java.util.List;
 
 /* see the PDF for descriptions of the methods and fields in this class
@@ -171,5 +172,43 @@ public abstract class Critter {
 	public static void worldTimeStep() {
 	}
 	
-	public static void displayWorld() {}
+	public static void displayWorld() {
+		//construct critterWorld
+		String[][] critterWorld = new String[Params.world_height + 2][Params.world_width + 2];
+		
+		//unoccupited spaces are initially empty
+		for(int i = 0; i < Params.world_height + 2; i ++){
+			for(int j = 0; j < Params.world_width + 2; j ++){
+				critterWorld[i][j] = " ";
+			}
+		}
+		
+		//construct borders
+		critterWorld[0][0] = "+";
+		critterWorld[0][Params.world_width + 1] = "+";
+		critterWorld[Params.world_height + 1][0] = "+";
+		critterWorld[Params.world_height + 1][Params.world_width + 1] = "+";
+		for(int i = 1; i <= Params.world_width; i ++){
+			critterWorld[0][i] = "-";
+			critterWorld[Params.world_height + 1][i] = "-";
+		}
+		for(int i = 1; i <= Params.world_height; i ++){
+			critterWorld[i][0] = "|";
+			critterWorld[i][Params.world_width + 1] = "|";
+		}
+		
+		// iterate though critter collection
+		// get position, and place critters on critterWorld
+		for(Critter s : population){
+			critterWorld[s.x_coord + 1][s.y_coord + 1] = s.toString(); 
+		}
+		
+		// print out critterWorld to System.out
+		for(int i = 0; i < Params.world_height + 2; i ++){
+			for(int j = 0; j < Params.world_width + 2; j ++){
+				System.out.print(critterWorld[i][j]);
+			}
+			System.out.println();
+		}
+	}//end displayWorld()
 }
