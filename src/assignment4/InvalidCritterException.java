@@ -1,4 +1,4 @@
-/*
+/* CRITTERS InvalidCritterException.java
  * EE422C Project 4 submission by
  * <Gaurav Nagar>
  * <gn3544>
