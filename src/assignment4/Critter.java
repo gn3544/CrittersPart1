@@ -25,7 +25,7 @@ public abstract class Critter {
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
 	private boolean alreadyMoved = false;
-
+	//ADD: private field for if critter is currently fighting!
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
@@ -59,11 +59,11 @@ public abstract class Critter {
 			x_offset = offset;
 		}
 		else if ((direction == 3) || (direction == 4) || (direction == 5)){
-			x_offset = offset;
+			x_offset = -1*offset;
 		}
 		
 		if ((direction == 1) || (direction == 2) || (direction == 3)){
-			y_offset = offset;
+			y_offset = -1*offset;
 		}
 		else if ((direction == 5) || (direction == 6) || (direction == 7)){
 			y_offset = offset;
@@ -85,11 +85,11 @@ public abstract class Critter {
 			x_offset = offset;
 		}
 		else if ((direction == 3) || (direction == 4) || (direction == 5)){
-			x_offset = offset;
+			x_offset = -1*offset;
 		}
 		
 		if ((direction == 1) || (direction == 2) || (direction == 3)){
-			y_offset = offset;
+			y_offset = -1*offset;
 		}
 		else if ((direction == 5) || (direction == 6) || (direction == 7)){
 			y_offset = offset;
@@ -149,8 +149,8 @@ public abstract class Critter {
 		try{
 			Class<?> critterClass = Class.forName(myPackage + "." + critter_class_name);
 			Critter newCritter = (Critter) critterClass.newInstance();
-			newCritter.x_coord = getRandomInt(Params.world_width);
-			newCritter.y_coord = getRandomInt(Params.world_height);
+			newCritter.x_coord = getRandomInt(Params.world_width + 1);
+			newCritter.y_coord = getRandomInt(Params.world_height + 1);
 			newCritter.energy = Params.start_energy;
 			population.add(newCritter);
 		}
@@ -328,10 +328,32 @@ public abstract class Critter {
 		}
 	}
 	
-	private static void critterEncounter(Critter critterOne, Critter critterTwo){
+	private static void critterEncounter(Critter A, Critter B){
 		
-		if (critterOne.energy > 0 && critterTwo.energy > 0){
+		boolean fightA = false, fightB = false;
+		int rollA = 0, rollB = 0;
+		if (A.energy > 0 && B.energy > 0){
+			fightA = A.fight(B.toString()); //invoke the fight, add flag for walking and running
+			fightB = B.fight(A.toString());
+		}
+		
+		if (A.energy > 0 && B.energy > 0 && A.x_coord == B.x_coord && A.y_coord == B.y_coord){
+			if (fightA){ //roll the dies
+				rollA = Critter.getRandomInt(A.energy + 1);
+			}
 			
+			if (fightB){
+				rollB = Critter.getRandomInt(B.energy + 1);
+			}
+			
+			if (rollA >= rollB){ //by default A is winner if rollA == rollB
+				A.energy += B.energy/2; //NOT SURE if we round up or down on divide by 2
+				B.energy = 0;
+			}
+			else{
+				B.energy += A.energy/2;
+				A.energy = 0;
+			}
 		}
 		
 	}
