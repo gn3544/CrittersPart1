@@ -23,6 +23,7 @@ public abstract class Critter {
 	private static String myPackage;
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
+	private boolean alreadyMoved = false;
 
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
@@ -49,13 +50,85 @@ public abstract class Critter {
 	private int y_coord;
 	
 	protected final void walk(int direction) {
+		int offset = 1; //changes direction of this by walking 1 unit
+		int x_offset = 0, y_offset = 0;
+		this.energy -= Params.walk_energy_cost;
+		
+		if ((direction == 0) || (direction == 1) || (direction == 7)){
+			x_offset = offset;
+		}
+		else if ((direction == 3) || (direction == 4) || (direction == 5)){
+			x_offset = offset;
+		}
+		
+		if ((direction == 1) || (direction == 2) || (direction == 3)){
+			y_offset = offset;
+		}
+		else if ((direction == 5) || (direction == 6) || (direction == 7)){
+			y_offset = offset;
+		}
+		
+		if (!alreadyMoved){
+			x_coord += x_offset;
+			y_coord += y_offset;
+			alreadyMoved = true;
+		}
 	}
 	
 	protected final void run(int direction) {
+		int offset = 2; //changes direction of this by running 2 units
+		int x_offset = 0, y_offset = 0;
+		this.energy -= Params.run_energy_cost;
 		
+		if ((direction == 0) || (direction == 1) || (direction == 7)){
+			x_offset = offset;
+		}
+		else if ((direction == 3) || (direction == 4) || (direction == 5)){
+			x_offset = offset;
+		}
+		
+		if ((direction == 1) || (direction == 2) || (direction == 3)){
+			y_offset = offset;
+		}
+		else if ((direction == 5) || (direction == 6) || (direction == 7)){
+			y_offset = offset;
+		}
+		
+		if (!alreadyMoved){
+			x_coord += x_offset;
+			y_coord += y_offset;
+			alreadyMoved = true;
+		}
 	}
 	
 	protected final void reproduce(Critter offspring, int direction) {
+		int x_offset = 0, y_offset = 0; //changes direction of offspring
+		if ((direction == 0) || (direction == 1) || (direction == 7)){
+			x_offset = 1;
+		}
+		else if ((direction == 3) || (direction == 4) || (direction == 5)){
+			x_offset = -1;
+		}
+		
+		if ((direction == 1) || (direction == 2) || (direction == 3)){
+			y_offset = -1;
+		}
+		else if ((direction == 5) || (direction == 6) || (direction == 7)){
+			y_offset = 1;
+		}
+		try{
+			if (this.energy > 0 && this.energy >= Params.min_reproduce_energy){
+				offspring = (Critter) this.getClass().newInstance();
+				offspring.energy = this.energy/2; //rounding down energy
+				this.energy -= offspring.energy; //rounding up energy
+				offspring.x_coord = this.x_coord + x_offset;
+				offspring.y_coord = this.y_coord + y_offset;
+				babies.add(offspring);
+			}
+		}
+		catch (Exception e1){ //must catch exceptions thrown by newInstance() 
+			
+		}
 	}
 
 	public abstract void doTimeStep();
@@ -202,14 +275,21 @@ public abstract class Critter {
 		
 		HashMap<ArrayList<Integer>, ArrayList<Critter>> coordMap = new HashMap<ArrayList<Integer>, ArrayList<Critter>>();
 		//coordMap is a mapping from coordinates to an arrayList of Critters to keep track of multiple Critters on a single coordinate
+		for (Critter critter: population){
+			critter.alreadyMoved = false;
+		}
+		
 		for (Critter critter: population){ //first do time step, precondition is that all are alive
 			critter.doTimeStep();
 		}
+		
 		for (int i = 0; i < population.size(); i++){ //remove dead critters from doTimeStep()
 			if (population.get(i).getEnergy() <= 0){
 				population.remove(i);
+				i--;
 			}
 		}
+		
 		for (Critter critter: population){
 			ArrayList<Integer> coordinates = new ArrayList<Integer>(2);
 			coordinates.add(0, critter.x_coord);
@@ -219,24 +299,53 @@ public abstract class Critter {
 			}
 			coordMap.get(coordinates).add(critter);
 		}
-		encounter(coordMap);
-		for (Critter babyCritter: babies){
-			population.add(babyCritter);
-		}
-		for (Critter critter: population){
+		
+		encounter(coordMap); //fix all encounters
+		
+		for (Critter critter: population){ //update rest energy
 			critter.energy -= Params.rest_energy_cost;
 		}
-		for (int i = 0; i < population.size(); i++){ //remove dead critters from encounter()
+		
+		for (int i = 0; i < population.size(); i++){ //remove dead critters after encounter and staying still
 			if (population.get(i).getEnergy() <= 0){
 				population.remove(i);
+				i--;
 			}
 		}
+		generateAlgae();
+		population.addAll(babies);
 		babies.clear();
 	}
 	
 	private static void encounter(HashMap<ArrayList<Integer>, ArrayList<Critter>> location){
+		for (ArrayList<Integer> key: location.keySet()){
+			for (int i = 0; i < location.get(key).size(); i++){
+				for (int j = i + 1; j < location.get(key).size(); j++){
+					critterEncounter(location.get(key).get(i), location.get(key).get(j));
+				}
+			}
+		}
+	}
+	
+	private static void critterEncounter(Critter critterOne, Critter critterTwo){
+		
+		if (critterOne.energy > 0 && critterTwo.energy > 0){
+			
+		}
 		
 	}
+	
+	private static void generateAlgae(){
+		try{
+			for (int i = 0; i < Params.refresh_algae_count; i++){
+				makeCritter("Algae");
+			}
+		}
+		catch (Exception e1){
+			
+		}
+	}
+	
 	public static void displayWorld() {
 		//construct critterWorld
 		String[][] critterWorld = new String[Params.world_height + 2][Params.world_width + 2];
