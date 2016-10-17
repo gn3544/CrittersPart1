@@ -11,7 +11,11 @@
  */
 package assignment4;
 
+<<<<<<< HEAD
 import java.util.List;
+=======
+import java.util.*; //fine to change import statements?
+>>>>>>> adc260f0d00847acafe82d6b542d42cdf311e268
 
 /* see the PDF for descriptions of the methods and fields in this class
  * you may add fields, methods or inner classes to Critter ONLY if you make your additions private
@@ -72,6 +76,25 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
+		try{
+			Class<?> critterClass = Class.forName(myPackage + "." + critter_class_name);
+			Critter newCritter = (Critter) critterClass.newInstance();
+			newCritter.x_coord = getRandomInt(Params.world_width);
+			newCritter.y_coord = getRandomInt(Params.world_height);
+			newCritter.energy = Params.start_energy;
+			population.add(newCritter);
+		}
+		catch (ClassNotFoundException e1){
+			throw new InvalidCritterException(critter_class_name);
+		}
+		catch (InstantiationException e2){
+			throw new InvalidCritterException(critter_class_name);
+		}
+		catch (IllegalAccessException e3){
+			throw new InvalidCritterException(critter_class_name);
+		}
+		finally{
+		}
 	}
 	
 	/**
@@ -82,7 +105,17 @@ public abstract class Critter {
 	 */
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
 		List<Critter> result = new java.util.ArrayList<Critter>();
-	
+		try{
+			Class<?> critterClass = Class.forName(myPackage + "." + critter_class_name);
+			for (Critter critter: population){
+				if (critter.getClass().equals(critterClass)){ //maybe use isAssignable
+					result.add(critter);
+				}
+			}
+		}
+		catch (ClassNotFoundException e1){
+			throw new InvalidCritterException(critter_class_name);
+		}
 		return result;
 	}
 	
@@ -166,11 +199,48 @@ public abstract class Critter {
 	 * Clear the world of all critters, dead and alive
 	 */
 	public static void clearWorld() {
+		population.clear();
 	}
 	
 	public static void worldTimeStep() {
+		
+		HashMap<ArrayList<Integer>, ArrayList<Critter>> coordMap = new HashMap<ArrayList<Integer>, ArrayList<Critter>>();
+		//coordMap is a mapping from coordinates to an arrayList of Critters to keep track of multiple Critters on a single coordinate
+		for (Critter critter: population){ //first do time step, precondition is that all are alive
+			critter.doTimeStep();
+		}
+		for (int i = 0; i < population.size(); i++){ //remove dead critters from doTimeStep()
+			if (population.get(i).getEnergy() <= 0){
+				population.remove(i);
+			}
+		}
+		for (Critter critter: population){
+			ArrayList<Integer> coordinates = new ArrayList<Integer>(2);
+			coordinates.add(0, critter.x_coord);
+			coordinates.add(1, critter.y_coord);
+			if (!coordMap.containsKey(coordinates)){
+				coordMap.put(coordinates, new ArrayList<Critter>());
+			}
+			coordMap.get(coordinates).add(critter);
+		}
+		encounter(coordMap);
+		for (Critter babyCritter: babies){
+			population.add(babyCritter);
+		}
+		for (Critter critter: population){
+			critter.energy -= Params.rest_energy_cost;
+		}
+		for (int i = 0; i < population.size(); i++){ //remove dead critters from encounter()
+			if (population.get(i).getEnergy() <= 0){
+				population.remove(i);
+			}
+		}
+		babies.clear();
 	}
 	
+	private static void encounter(HashMap<ArrayList<Integer>, ArrayList<Critter>> location){
+		
+	}
 	public static void displayWorld() {
 		//construct critterWorld
 		String[][] critterWorld = new String[Params.world_height + 2][Params.world_width + 2];
