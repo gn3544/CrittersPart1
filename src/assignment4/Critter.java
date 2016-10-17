@@ -11,11 +11,8 @@
  */
 package assignment4;
 
-<<<<<<< HEAD
-import java.util.List;
-=======
 import java.util.*; //fine to change import statements?
->>>>>>> adc260f0d00847acafe82d6b542d42cdf311e268
+
 
 /* see the PDF for descriptions of the methods and fields in this class
  * you may add fields, methods or inner classes to Critter ONLY if you make your additions private

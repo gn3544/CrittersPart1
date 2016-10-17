@@ -32,6 +32,10 @@ public class CommandParse {
 		}
 		String delims = "[ ]+";
 		String[] noSpace = temp.split(delims); //get rid of all spaces
+		if(noSpace.length == 0){
+			System.out.println("invalid command: ");
+			return flag;
+		}
 		String[] tokens = new String[noSpace.length-1];
 		for(int i = 0; i < tokens.length; i ++){
 			tokens[i] = noSpace[i + 1];
@@ -42,68 +46,85 @@ public class CommandParse {
 			return true;			
 		}	
 		else if(tokens[0].equals("show") && (tokens.length == 1)){
-			Critter.displayWorld();			
+			Critter.displayWorld();			 
 		}	
 		else if(tokens[0].equals("step")){
 			if(tokens.length > 2){
-				//processing error : print message
-				System.out.println("processing error");
+				processError(tokens);
 			}  
 			else if(tokens.length == 1){
 				executeStep(1);
 			}
 			else if((tokens.length == 2)){
 				try{
-					executeStep(Integer.parseInt(tokens[1]));
+					int num = Integer.parseInt(tokens[1]);
+					if(num < 0) processError(tokens);
+					executeStep(num);
 				}catch(NumberFormatException e){
-					//processing error
+					processError(tokens);
 				}
 			}
 		}
 		else if(tokens[0].equals("seed")){  
 			if(tokens.length == 2){
 				try{
-					executeSeed(Long.parseLong(tokens[1]));					
+					Long num = Long.parseLong(tokens[1]);
+					if(num < 0) processError(tokens);
+					executeSeed(num);					
 				}catch(NumberFormatException e1){
-					//processing error
+					processError(tokens);
 				}
 			}
 			else{
-				//processing error : print message 
-				System.out.println("processing error");
+				processError(tokens);
 			}
 		}
 		else if(tokens[0].equals("make")){
 			if(tokens.length < 2 || tokens.length > 3){
-				System.out.println("processing error");
+				processError(tokens);
 			}
 			else if(tokens.length == 2){
 				try{
 				Critter.makeCritter(tokens[1]);	
 				}
 				catch(InvalidCritterException e2){
-					System.out.println("wrong critte_type_name");
+					processError(tokens);
 				}
 			}
 			else if(tokens.length == 3){
 				try{
 					int numCall = Integer.parseInt(tokens[2]);
+					if((numCall < 0)||(numCall != (int)numCall)){
+						processError(tokens);
+					}
 					for (int i = 0; i < numCall; i ++){
 						try{
 							Critter.makeCritter(tokens[1]);
 						}
 						catch(InvalidCritterException e3){
-							
+							processError(tokens);
+							break;
 						}
 					}
 				}
 				catch(NumberFormatException e4){
-					System.out.println("wrong integer input");
+					processError(tokens);
 				}
 			}
 		}
-		else if(command.equals("stats")){
-			
+		else if(tokens[0].equals("stats")){
+			if(tokens.length != 2){
+				processError(tokens);
+			}
+			else{
+				try{
+				List<Critter> instances = Critter.getInstances(tokens[1]);		
+				Critter.runStats(instances);
+				}
+				catch(InvalidCritterException e5){
+					processError(tokens);
+				}
+			}
 		}
 		else{//For invalid commands, print error message here
 			String errorMsg;
@@ -122,18 +143,20 @@ public class CommandParse {
 	} 
 	
 	public static void executeStep(int numStep){
-		
+		for(int i = 0; i < numStep; i ++){
+			Critter.worldTimeStep();
+		}
 	}
 	
 	public static void executeSeed(long number){
-		
+		Critter.setSeed(number);
 	}
 	
-	public static void executeMake(long number){
-		
-	}
-	
-	public static void executeState(long number){
-		 
+	public static void processError(String[] message){
+		System.out.print("error processing:");
+		for(String word : message){
+			System.out.print(" " + word);
+		}
+		System.out.println();
 	}
 }
