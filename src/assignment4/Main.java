@@ -65,12 +65,34 @@ public class Main {
         } else { // if no arguments to main
             kb = new Scanner(System.in); // use keyboard and console
         }
-
+ 
         /* Do not alter the code above for your submission. */
+        
         /* Write your code below. */
-        Critter.displayWorld();
+        
+        //controller component
+        boolean terminate = false; 
+        while(!terminate){
+        	//print end use prompt
+        	old.print("critters>");
+        	String command = "";
+        	//fetch user given command
+        	if (kb.hasNextLine()){
+        		command = kb.nextLine();        		
+        	}else{
+        		command = kb.next() + "\n";
+        	}
+        	//process user given command
+        	Scanner lineProcess = new Scanner (command);
+        	boolean flag = CommandParse.processCommand(lineProcess);
+        	terminate = flag;
+        }
+        
+
         /* Write your code above */
         System.out.flush();
 
     }
+    
+    
 }
