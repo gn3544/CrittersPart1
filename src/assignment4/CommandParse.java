@@ -10,7 +10,9 @@
  * Fall 2016
  */
 package assignment4;
+import java.lang.reflect.*;
 import java.util.*;
+
 
 
 public class CommandParse {
@@ -118,10 +120,28 @@ public class CommandParse {
 			}
 			else{
 				try{
+				String myPackage = Critter.class.getPackage().toString().split(" ")[1];
 				List<Critter> instances = Critter.getInstances(tokens[1]);		
-				Critter.runStats(instances);
+				Class <?> cls = Class.forName(myPackage + "." + tokens[1]);
+				Method method = cls.getMethod("runStats", List.class);
+				method.invoke(cls, instances);
 				}
-				catch(InvalidCritterException e5){
+				catch(InvalidCritterException e){
+					processError(tokens);
+				}
+				catch(ClassNotFoundException e){
+					processError(tokens);
+				}
+				catch(NoSuchMethodException e){
+					processError(tokens);
+				}
+				catch(InvocationTargetException e){
+					processError(tokens);
+				}
+				catch(IllegalArgumentException e){
+					processError(tokens);
+				}
+				catch(IllegalAccessException e){
 					processError(tokens);
 				}
 			}
@@ -140,14 +160,13 @@ public class CommandParse {
 		
 		//return flag for while loop
 		return flag;
-	} 
+	}  
 	
 	public static void executeStep(int numStep){
 		for(int i = 0; i < numStep; i ++){
 			Critter.worldTimeStep();
 		}
 	}
-	
 	public static void executeSeed(long number){
 		Critter.setSeed(number);
 	}

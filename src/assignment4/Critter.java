@@ -149,8 +149,8 @@ public abstract class Critter {
 		try{
 			Class<?> critterClass = Class.forName(myPackage + "." + critter_class_name);
 			Critter newCritter = (Critter) critterClass.newInstance();
-			newCritter.x_coord = getRandomInt(Params.world_width + 1);
-			newCritter.y_coord = getRandomInt(Params.world_height + 1);
+			newCritter.x_coord = getRandomInt(Params.world_width) + 1;
+			newCritter.y_coord = getRandomInt(Params.world_height) + 1;
 			newCritter.energy = Params.start_energy;
 			population.add(newCritter);
 		}
@@ -372,14 +372,12 @@ public abstract class Critter {
 	public static void displayWorld() {
 		//construct critterWorld
 		String[][] critterWorld = new String[Params.world_height + 2][Params.world_width + 2];
-		
 		//unoccupited spaces are initially empty
 		for(int i = 0; i < Params.world_height + 2; i ++){
 			for(int j = 0; j < Params.world_width + 2; j ++){
 				critterWorld[i][j] = " ";
 			}
 		}
-		
 		//construct borders
 		critterWorld[0][0] = "+";
 		critterWorld[0][Params.world_width + 1] = "+";
@@ -393,19 +391,37 @@ public abstract class Critter {
 			critterWorld[i][0] = "|";
 			critterWorld[i][Params.world_width + 1] = "|";
 		}
-		
 		// iterate though critter collection
 		// get position, and place critters on critterWorld
 		for(Critter s : population){
-			critterWorld[s.x_coord + 1][s.y_coord + 1] = s.toString(); 
-		}
-		
+			//take care of warparounds for walk and run
+			if(s.y_coord == 0){
+				s.y_coord = Params.world_height;
+			}
+			else if(s.y_coord < 0){
+				s.y_coord =(Params.world_height - ((-s.y_coord)%Params.world_height));
+			}
+			else if(s.y_coord > Params.world_height){
+				s.y_coord = s.y_coord % Params.world_height;
+			}
+			if(s.x_coord == 0){
+				s.x_coord = Params.world_width;
+			}
+			else if(s.x_coord > Params.world_width){
+				s.x_coord = s.x_coord % Params.world_width;
+			}
+			else if(s.x_coord < 0){
+				s.x_coord =(Params.world_width - ((-s.x_coord)%Params.world_width));
+			}
+			//place critters on critterWorld
+			critterWorld[s.y_coord][s.x_coord] = s.toString(); 
+		} 
 		// print out critterWorld to System.out
 		for(int i = 0; i < Params.world_height + 2; i ++){
 			for(int j = 0; j < Params.world_width + 2; j ++){
 				System.out.print(critterWorld[i][j]);
 			}
-			System.out.println();
+			System.out.println(); 
 		}
 	}//end displayWorld()
 }
