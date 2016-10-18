@@ -25,7 +25,7 @@ public abstract class Critter {
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
 	private boolean alreadyMoved = false;
-	//ADD: private field for if critter is currently fighting!
+	private boolean isFighting = false;
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
@@ -54,6 +54,7 @@ public abstract class Critter {
 		int offset = 1; //changes direction of this by walking 1 unit
 		int x_offset = 0, y_offset = 0;
 		this.energy -= Params.walk_energy_cost;
+		HashMap<ArrayList<Integer>, ArrayList<Critter>> coordMap = getCoordMap();
 		
 		if ((direction == 0) || (direction == 1) || (direction == 7)){
 			x_offset = offset;
@@ -70,9 +71,14 @@ public abstract class Critter {
 		}
 		
 		if (!alreadyMoved){
-			x_coord += x_offset;
-			y_coord += y_offset;
-			alreadyMoved = true;
+			ArrayList<Integer> newCoord = new ArrayList<Integer>(2);
+			newCoord.add(0, x_coord + x_offset);
+			newCoord.add(1, y_coord + y_offset);
+			if ((isFighting && !coordMap.containsKey(newCoord)) || !isFighting){
+				x_coord += x_offset;
+				y_coord += y_offset;
+				alreadyMoved = true;
+			}
 		}
 	}
 	
@@ -80,6 +86,7 @@ public abstract class Critter {
 		int offset = 2; //changes direction of this by running 2 units
 		int x_offset = 0, y_offset = 0;
 		this.energy -= Params.run_energy_cost;
+		HashMap<ArrayList<Integer>, ArrayList<Critter>> coordMap = getCoordMap();
 		
 		if ((direction == 0) || (direction == 1) || (direction == 7)){
 			x_offset = offset;
@@ -96,9 +103,14 @@ public abstract class Critter {
 		}
 		
 		if (!alreadyMoved){
-			x_coord += x_offset;
-			y_coord += y_offset;
-			alreadyMoved = true;
+			ArrayList<Integer> newCoord = new ArrayList<Integer>(2);
+			newCoord.add(0, x_coord + x_offset);
+			newCoord.add(1, y_coord + y_offset);
+			if ((isFighting && !coordMap.containsKey(newCoord)) || !isFighting){
+				x_coord += x_offset;
+				y_coord += y_offset;
+				alreadyMoved = true;
+			}
 		}
 	}
 	
@@ -178,7 +190,7 @@ public abstract class Critter {
 		try{
 			Class<?> critterClass = Class.forName(myPackage + "." + critter_class_name);
 			for (Critter critter: population){
-				if (critter.getClass().equals(critterClass)){ //maybe use isAssignable
+				if (critter.getClass().equals(critterClass)){
 					result.add(critter);
 				}
 			}
@@ -274,8 +286,6 @@ public abstract class Critter {
 	
 	public static void worldTimeStep() {
 		
-		HashMap<ArrayList<Integer>, ArrayList<Critter>> coordMap = new HashMap<ArrayList<Integer>, ArrayList<Critter>>();
-		//coordMap is a mapping from coordinates to an arrayList of Critters to keep track of multiple Critters on a single coordinate
 		for (Critter critter: population){
 			critter.alreadyMoved = false;
 		}
@@ -291,17 +301,7 @@ public abstract class Critter {
 			}
 		}
 		
-		for (Critter critter: population){
-			ArrayList<Integer> coordinates = new ArrayList<Integer>(2);
-			coordinates.add(0, critter.x_coord);
-			coordinates.add(1, critter.y_coord);
-			if (!coordMap.containsKey(coordinates)){
-				coordMap.put(coordinates, new ArrayList<Critter>());
-			}
-			coordMap.get(coordinates).add(critter);
-		}
-		
-		encounter(coordMap); //fix all encounters
+		encounter(getCoordMap()); //fix all encounters
 		
 		for (Critter critter: population){ //update rest energy
 			critter.energy -= Params.rest_energy_cost;
@@ -333,8 +333,12 @@ public abstract class Critter {
 		boolean fightA = false, fightB = false;
 		int rollA = 0, rollB = 0;
 		if (A.energy > 0 && B.energy > 0){
+			B.isFighting = true;
+			A.isFighting = true;
 			fightA = A.fight(B.toString()); //invoke the fight, add flag for walking and running
 			fightB = B.fight(A.toString());
+			B.isFighting = false;
+			A.isFighting = false;
 		}
 		
 		if (A.energy > 0 && B.energy > 0 && A.x_coord == B.x_coord && A.y_coord == B.y_coord){
@@ -367,6 +371,21 @@ public abstract class Critter {
 		catch (Exception e1){
 			
 		}
+	}
+	
+	private static HashMap<ArrayList<Integer>, ArrayList<Critter>> getCoordMap(){
+		HashMap<ArrayList<Integer>, ArrayList<Critter>> coordMap = new HashMap<ArrayList<Integer>, ArrayList<Critter>>();
+		//coordMap is a mapping from coordinates to an arrayList of Critters to keep track of multiple Critters on a single coordinate
+		for (Critter critter: population){
+			ArrayList<Integer> coordinates = new ArrayList<Integer>(2);
+			coordinates.add(0, critter.x_coord);
+			coordinates.add(1, critter.y_coord);
+			if (!coordMap.containsKey(coordinates)){
+				coordMap.put(coordinates, new ArrayList<Critter>());
+			}
+			coordMap.get(coordinates).add(critter);
+		}
+		return coordMap;
 	}
 	
 	public static void displayWorld() {
