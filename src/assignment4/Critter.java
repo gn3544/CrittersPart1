@@ -190,7 +190,7 @@ public abstract class Critter {
 		try{
 			Class<?> critterClass = Class.forName(myPackage + "." + critter_class_name);
 			for (Critter critter: population){
-				if (critter.getClass().equals(critterClass)){
+				if (critter.getClass().equals(critterClass)){ 
 					result.add(critter);
 				}
 			}
@@ -275,6 +275,7 @@ public abstract class Critter {
 		protected static List<Critter> getBabies() {
 			return babies;
 		}
+		
 	}
 
 	/**
@@ -443,4 +444,8 @@ public abstract class Critter {
 			System.out.println(); 
 		}
 	}//end displayWorld()
+	
+	public boolean isDead(){
+		return this.energy <= 0;
+	}
 }
