@@ -44,11 +44,21 @@ public class CommandParse {
 		} 
 		
 		//call appropriate execute function
-		if(tokens[0].equals("quit") && (tokens.length == 1)){
-			return true;			
+		if(tokens[0].equals("quit")){
+			if(tokens.length == 1){
+				return true;
+			}
+			else{
+				processError(tokens);
+			}
 		}	
-		else if(tokens[0].equals("show") && (tokens.length == 1)){
-			Critter.displayWorld();			 
+		else if(tokens[0].equals("show")){
+			if(tokens.length == 1){			 
+				Critter.displayWorld();
+			}
+			else{
+				processError(tokens);
+			}
 		}	
 		else if(tokens[0].equals("step")){
 			if(tokens.length > 2){
