@@ -122,12 +122,11 @@ public class A4SampleTest2 {
 		runner.setY_coord(y);
 		fighter.setX_coord(x);
 		fighter.setY_coord(y);
-		
 		assertEquals(num, TestCritter.getPopulation().size());
 		if (DEBUG) System.out.println(TestCritter.getPopulation());
 		Critter.worldTimeStep();
 		if (DEBUG) {
-			System.out.println(TestCritter.getPopulation());	
+			System.out.println(TestCritter.getPopulation());
 			Critter.displayWorld();
 		}
 		assertFalse(runner.isDead());

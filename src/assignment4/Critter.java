@@ -341,8 +341,7 @@ public abstract class Critter {
 			B.isFighting = false;
 			A.isFighting = false;
 		}
-		
-		if (A.energy > 0 && B.energy > 0 && A.x_coord == B.x_coord && A.y_coord == B.y_coord){
+		if (A.energy > 0 && B.energy > 0 && (A.x_coord == B.x_coord) && (A.y_coord == B.y_coord)){
 			if (fightA){ //roll the dies
 				rollA = Critter.getRandomInt(A.energy + 1);
 			}
@@ -360,7 +359,6 @@ public abstract class Critter {
 				A.energy = 0;
 			}
 		}
-		
 	}
 	
 	private static void generateAlgae(){
@@ -415,26 +413,21 @@ public abstract class Critter {
 		// get position, and place critters on critterWorld
 		for(Critter s : population){
 			//take care of warparounds for walk and run
-			if(s.y_coord == 0){
-				s.y_coord = Params.world_height;
-			}
-			else if(s.y_coord < 0){
-				s.y_coord =(Params.world_height - ((-s.y_coord)%Params.world_height));
-			}
-			else if(s.y_coord > Params.world_height){
+			if(s.y_coord > Params.world_height){
 				s.y_coord = s.y_coord % Params.world_height;
 			}
-			if(s.x_coord == 0){
-				s.x_coord = Params.world_width;
+			else if(s.y_coord < 0){
+				s.y_coord = (s.y_coord % Params.world_height) + Params.world_height;
 			}
-			else if(s.x_coord > Params.world_width){
+			
+			if(s.x_coord > Params.world_width){
 				s.x_coord = s.x_coord % Params.world_width;
 			}
 			else if(s.x_coord < 0){
-				s.x_coord =(Params.world_width - ((-s.x_coord)%Params.world_width));
+				s.x_coord = (s.x_coord % Params.world_width) + Params.world_width;
 			}
 			//place critters on critterWorld
-			critterWorld[s.y_coord][s.x_coord] = s.toString(); 
+			critterWorld[s.y_coord + 1][s.x_coord + 1] = s.toString(); 
 		} 
 		// print out critterWorld to System.out
 		for(int i = 0; i < Params.world_height + 2; i ++){
