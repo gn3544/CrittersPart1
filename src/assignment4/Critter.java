@@ -314,12 +314,14 @@ public abstract class Critter {
 				i--;
 			}
 		}
+		
 		generateAlgae();
 		population.addAll(babies);
 		babies.clear();
 	}
 	
 	private static void encounter(HashMap<ArrayList<Integer>, ArrayList<Critter>> location){
+		/*
 		for (ArrayList<Integer> key: location.keySet()){
 			for (int i = 0; i < location.get(key).size(); i++){
 				for (int j = i + 1; j < location.get(key).size(); j++){
@@ -327,6 +329,14 @@ public abstract class Critter {
 				}
 			}
 		}
+		*/
+		 for (int i = 0; i < population.size(); i++){
+		 	for (int j = i + 1; j < population.size(); j++){
+		 		if (population.get(i).x_coord == population.get(j).x_coord && population.get(i).y_coord == population.get(j).y_coord){
+		 			critterEncounter(population.get(i), population.get(j));
+		 		}
+		 	}
+		 }
 	}
 	
 	private static void critterEncounter(Critter A, Critter B){
@@ -353,10 +363,12 @@ public abstract class Critter {
 			if (rollA >= rollB){ //by default A is winner if rollA == rollB
 				A.energy += B.energy/2; //NOT SURE if we round up or down on divide by 2
 				B.energy = 0;
+				population.remove(B); //maintains the invariant that only alive critters are on the board
 			}
 			else{
 				B.energy += A.energy/2;
 				A.energy = 0;
+				population.remove(A);
 			}
 		}
 	}
