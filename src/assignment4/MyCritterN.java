@@ -4,10 +4,16 @@ public class MyCritterN extends Critter.TestCritter{
 	
 	boolean alreadyMoved;
 	
+	/**
+	 * Constructor that keeps track of if a MyCritterN object has moved
+	 */
 	public MyCritterN(){
 		alreadyMoved = false;
 	}
 	
+	/**
+	 * MyCritterN object will run, walk, or reproduce randomly with equal chance
+	 */
 	@Override
 	public void doTimeStep() {
 		int random = getRandomInt(9);
@@ -24,6 +30,9 @@ public class MyCritterN extends Critter.TestCritter{
 		}
 	}
 	
+	/**
+	 * Runs if it hasn't moved before, else fights
+	 */
 	@Override
 	public boolean fight(String opponent) {
 		if (!alreadyMoved){
@@ -33,6 +42,9 @@ public class MyCritterN extends Critter.TestCritter{
 		return true;
 	}
 	
+	/**
+	 * Returns String characterization of MyCritterN
+	 */
 	public String toString() {
 		return "N";
 	}

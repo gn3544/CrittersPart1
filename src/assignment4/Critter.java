@@ -50,6 +50,10 @@ public abstract class Critter {
 	private int x_coord;
 	private int y_coord;
 	
+	/**
+	 * Critter will walk 1 unit in the given direction
+	 * @param direction
+	 */
 	protected final void walk(int direction) {
 		int offset = 1; //changes direction of this by walking 1 unit
 		int x_offset = 0, y_offset = 0;
@@ -82,6 +86,10 @@ public abstract class Critter {
 		}
 	}
 	
+	/**
+	 * Critter will run 2 units in the given direction
+	 * @param direction
+	 */
 	protected final void run(int direction) {
 		int offset = 2; //changes direction of this by running 2 units
 		int x_offset = 0, y_offset = 0;
@@ -114,6 +122,11 @@ public abstract class Critter {
 		}
 	}
 	
+	/**
+	 * Critter reproduces new offspring of the same type and moves it in given direction
+	 * @param offspring
+	 * @param direction
+	 */
 	protected final void reproduce(Critter offspring, int direction) {
 		int x_offset = 0, y_offset = 0; //changes direction of offspring
 		if ((direction == 0) || (direction == 1) || (direction == 7)){
@@ -285,6 +298,9 @@ public abstract class Critter {
 		population.clear();
 	}
 	
+	/**
+	 * Conducts all activities done by critters for 1 time step
+	 */
 	public static void worldTimeStep() {
 		
 		for (Critter critter: population){
@@ -302,7 +318,8 @@ public abstract class Critter {
 			}
 		}
 		
-		encounter(getCoordMap()); //fix all encounters
+		//getCoordMap()
+		encounter(); //fix all encounters
 		
 		for (Critter critter: population){ //update rest energy
 			critter.energy -= Params.rest_energy_cost;
@@ -320,8 +337,12 @@ public abstract class Critter {
 		babies.clear();
 	}
 	
-	private static void encounter(HashMap<ArrayList<Integer>, ArrayList<Critter>> location){
+	/**
+	 * Performs all encounters with critters in the same coordinates
+	 */
+	private static void encounter(){
 		/*
+		HashMap<ArrayList<Integer>, ArrayList<Critter>> location
 		for (ArrayList<Integer> key: location.keySet()){
 			for (int i = 0; i < location.get(key).size(); i++){
 				for (int j = i + 1; j < location.get(key).size(); j++){
@@ -339,6 +360,11 @@ public abstract class Critter {
 		 }
 	}
 	
+	/**
+	 * Performs a specific encounter with two Critters within the same coordinate
+	 * @param A
+	 * @param B
+	 */
 	private static void critterEncounter(Critter A, Critter B){
 		
 		boolean fightA = false, fightB = false;
@@ -373,6 +399,9 @@ public abstract class Critter {
 		}
 	}
 	
+	/**
+	 * Generates Algae at every time step
+	 */
 	private static void generateAlgae(){
 		try{
 			for (int i = 0; i < Params.refresh_algae_count; i++){
@@ -384,6 +413,11 @@ public abstract class Critter {
 		}
 	}
 	
+	/**
+	 * Gets a map that maps a coordinate to a list of critters on the coordinate
+	 * @return HashMap<ArrayList<Integer>, ArrayList<Critter>> the map which contains the relation
+	 * between coordinates to critters within the coordinate
+	 */
 	private static HashMap<ArrayList<Integer>, ArrayList<Critter>> getCoordMap(){
 		HashMap<ArrayList<Integer>, ArrayList<Critter>> coordMap = new HashMap<ArrayList<Integer>, ArrayList<Critter>>();
 		//coordMap is a mapping from coordinates to an arrayList of Critters to keep track of multiple Critters on a single coordinate
@@ -399,6 +433,9 @@ public abstract class Critter {
 		return coordMap;
 	}
 	
+	/**
+	 * Displays the world and considers the torus
+	 */
 	public static void displayWorld() {
 		//construct critterWorld
 		String[][] critterWorld = new String[Params.world_height + 2][Params.world_width + 2];
@@ -425,25 +462,25 @@ public abstract class Critter {
 		// get position, and place critters on critterWorld
 		for(Critter s : population){
 			//take care of warparounds for walk and run
-			if(s.y_coord > Params.world_height){
+			if(s.y_coord >= Params.world_height){
 				s.y_coord = s.y_coord % Params.world_height;
 			}
 			else if(s.y_coord < 0){
 				s.y_coord = (s.y_coord % Params.world_height) + Params.world_height;
 			}
 			
-			if(s.x_coord > Params.world_width){
+			if(s.x_coord >= Params.world_width){
 				s.x_coord = s.x_coord % Params.world_width;
 			}
 			else if(s.x_coord < 0){
 				s.x_coord = (s.x_coord % Params.world_width) + Params.world_width;
 			}
 			//place critters on critterWorld
-			critterWorld[s.y_coord + 1][s.x_coord + 1] = s.toString(); 
+			critterWorld[s.x_coord + 1][s.y_coord + 1] = s.toString(); 
 		} 
 		// print out critterWorld to System.out
-		for(int i = 0; i < Params.world_height + 2; i ++){
-			for(int j = 0; j < Params.world_width + 2; j ++){
+		for(int i = 0; i < Params.world_height + 2; i++){
+			for(int j = 0; j < Params.world_width + 2; j++){
 				System.out.print(critterWorld[i][j]);
 			}
 			System.out.println(); 

@@ -4,10 +4,16 @@ public class MyCritterG extends Critter.TestCritter{
 	
 	int dir;
 	
+	/**
+	 * Gets a random direction variable
+	 */
 	public MyCritterG(){
 		dir = getRandomInt(8);
 	}
 	
+	/**
+	 * Will run/walk if energy permits, or does nothing
+	 */
 	@Override
 	public void doTimeStep() {
 		if (getEnergy() > Params.run_energy_cost){
@@ -18,6 +24,9 @@ public class MyCritterG extends Critter.TestCritter{
 		}
 	}
 	
+	/**
+	 * Fights if opponent is Algae, if not walks away if energy permit or tries to reproduce
+	 */
 	@Override
 	public boolean fight(String opponent) {
 		if (opponent.equals("@")){
@@ -31,6 +40,9 @@ public class MyCritterG extends Critter.TestCritter{
 		return false;
 	}
 	
+	/**
+	 * Returns String characterization of MyCritterG
+	 */
 	public String toString() {
 		return "G";
 	}

@@ -13,7 +13,7 @@ import java.awt.Point;
 import java.util.List;
 public class A4SampleTest2 {
 
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -71,6 +71,7 @@ public class A4SampleTest2 {
 
 	@Test
 	/**
+	 * 1.
 	 * Use MakeCritter to create a Critter, and makes sure walk works for 1 step.
 	 * @throws InvalidCritterException
 	 */
@@ -82,11 +83,11 @@ public class A4SampleTest2 {
 		int x1b = m1.getX_coord(); int  y1b = m1.getY_coord();
 		assertTrue((x1b - x1a == 1) || (x1b + Params.world_width - x1a) == 1);
 		assertTrue(Math.abs(y1b - y1a) == 0);
-	}
-	
+	}	
 	
 	@Test
 	/**
+	 * 7.
 	 * Walks 1 step each turn.  Check energy drop at each turn.
 	 */
 	public void WalkEnergyTest() throws InvalidCritterException {
@@ -94,25 +95,25 @@ public class A4SampleTest2 {
 		MyCritter1 c = (MyCritter1) Critter.TestCritter.getPopulation().get(0);
 		int step = 0;
 		int energyUsePerStep = Params.rest_energy_cost + Params.walk_energy_cost;
-		while (!c.isDead()) {
+		while (c.getEnergy() > 0) {
+//		while (!c.isDead()) {
 			assertEquals(Params.start_energy -step*energyUsePerStep, c.getEnergy());
 			Critter.worldTimeStep();
 			step++;
 		}		
 	}
-	
 
 	/**
-	 * 11.
-	 * Creates two Critters in the same spot, one being a runner.
-	 * Checks to see if runner moved, lost energy, and lived
-	 * @throws InvalidCritterException 
+	 * 11. Creates two Critters in the same spot, one being a runner. Checks to
+	 * see if runner moved, lost energy, and lived
+	 * 
+	 * @throws InvalidCritterException
 	 * 
 	 */
 	@Test
 	public void RunDuringFightTest() throws InvalidCritterException {
-		int x = 0; int y = 0;
-		Point p = new Point(x, y);
+		int x = 0;
+		int y = 0;
 		int num = 2;
 		Critter.makeCritter("MyCritter6");
 		MyCritter6 runner = (MyCritter6) Critter.getInstances("MyCritter6").get(0);
@@ -122,15 +123,16 @@ public class A4SampleTest2 {
 		runner.setY_coord(y);
 		fighter.setX_coord(x);
 		fighter.setY_coord(y);
+
 		assertEquals(num, TestCritter.getPopulation().size());
-		if (DEBUG) System.out.println(TestCritter.getPopulation());
 		Critter.worldTimeStep();
 		if (DEBUG) {
-			System.out.println(TestCritter.getPopulation());
 			Critter.displayWorld();
 		}
-		assertFalse(runner.isDead());
+		assertFalse(runner.getEnergy() <= 0);
+		assertEquals(Params.start_energy - Params.rest_energy_cost - Params.run_energy_cost, runner.getEnergy());
 		assertTrue(runner.getX_coord() != x || runner.getY_coord() != y);
 		assertTrue(fighter.getX_coord() == x && fighter.getY_coord() == y);
 	}
+
 }
