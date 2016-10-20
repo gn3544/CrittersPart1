@@ -1,4 +1,4 @@
-/* CRITTERS CritterK.java
+/* CRITTERS MyCritterK.java
  * EE422C Project 4 submission by
  * <Gaurav Nagar>
  * <gn3544>
@@ -23,7 +23,7 @@ package assignment4;
 
 import assignment4.Critter.TestCritter;
 
-public class CritterK extends TestCritter {
+public class MyCritterK extends TestCritter {
 
 	@Override
 	public void doTimeStep() {
