@@ -20,7 +20,7 @@ public class MyCritterG extends Critter.TestCritter{
 	
 	@Override
 	public boolean fight(String opponent) {
-		if (opponent.equals("Algae")){
+		if (opponent.equals("@")){
 			return true;
 		}
 		else if (getEnergy() > Params.walk_energy_cost){
